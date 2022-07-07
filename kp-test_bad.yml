@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Namespace
+metadata:
+  name: kp-test-510
+spec:
+  finalizers:
+    - kubernetes
+    
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: kp-pot-deployment
+  namespace: kp-test-510
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: kp-test-510-cli
+  template:
+    metadata:
+      labels:
+        app: kp-test-510-cli
+    spec:
+      nodeSelector:
+        kubernetes.io/os: linux
+      containers:
+        - name: kp-test-510-cli
+          image: my.trusted.repo.url.net/kp-test-510:2022.07.07.1
+          ports:
+            - containerPort: 80
+            - containerPort: 443
+          resources:
+            requests:
+              cpu: '0.25'
+              memory: 1G
+            limits:
+              cpu: '0.5'
+              memory: 4G
+              
+apiVersion: v1
+kind: Service
+metadata:
+  name: kp-test-510-cli-service
+  namespace: kp-test-510
+spec:
+  type: LoadBalancer
+  ports:
+    - targetPort: 80
+      name: port80
+      port: 80
+      protocol: TCP
+    - targetPort: 443
+      name: port443
+      port: 443
+      protocol: TCP
+  selector:
+    app: kp-test-510-cli
+    
+    
+# Is it allowed
